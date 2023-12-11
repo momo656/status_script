@@ -38,14 +38,19 @@ const scrapeImages = async () =>{
       await page.waitForSelector('#ticket-summary-widget > div > div > div.status-field')
       let element = await page.$('#ticket-summary-widget > div > div > div.status-field')
       let status = await page.evaluate(el => el.textContent, element)
-   
-       
-      
-      await page.waitForSelector('[data-test-id=jira-issue-status-value]')
-      let Element = await page.$('[data-test-id=jira-issue-status-value]')
-      let jira = await page.evaluate(el => el.textContent, Element)
       row.status = status.replace(/\s+/g, ' ').trim();
-      row['Jira Status']=jira.replace(/\s+/g, ' ').trim();
+       
+      try {
+        await page.waitForSelector('[data-test-id=jira-issue-status-value]')  
+        let Element = await page.$('[data-test-id=jira-issue-status-value]')
+        let jira = await page.evaluate(el => el.textContent, Element)
+        row['Jira Status']=jira.replace(/\s+/g, ' ').trim();
+      }
+      catch(err) {
+        console.error(`Jira status not found for URL ${row['FreshService Ticket URL']}`);
+          }
+      
+      
        row.save(); 
     }  
    
