@@ -61,8 +61,9 @@ const scrapeImages = async () =>{
           }
 
       try {
-        await page.waitForSelector('div:nth-child(5) > div.ticket-conversation-load-more--wrapper > button > span')  
-        let conversation = await page.$('div:nth-child(5) > div.ticket-conversation-load-more--wrapper > button > span')
+        new Promise(r => setTimeout(r, 5000));
+        await page.waitForSelector('#panel_details > div > div.ticket-conversation-load-more--wrapper > button > span')  
+        let conversation = await page.$('#panel_details > div > div.ticket-conversation-load-more--wrapper > button > span')
        
         let cst = await page.evaluate(el => el.textContent, conversation)
         console.log(parseInt(cst))
@@ -83,6 +84,3 @@ await browser.close();
 }
 
 scrapeImages()
-// #panel_details > div > div.ticket-conversation-load-more--wrapper > button > span
-// #ticket-summary-widget > div > div.status-info > div.status-field
-// #ticket-summary-widget > div > div > div.status-field
