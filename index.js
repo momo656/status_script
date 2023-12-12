@@ -34,6 +34,16 @@ const scrapeImages = async () =>{
     const sheet = doc.sheetsByIndex[0];
     let rows = await sheet.getRows();
     for (let row of rows){
+      if (row.status=="Closed (on time)"){  
+         continue
+
+      }else if (row.status=="Closed (late)"){
+         continue
+
+      }else if (row.status=="Not Related"){
+        continue
+
+     }else{
       await page.goto(row['FreshService Ticket URL']);
       await page.waitForSelector('#ticket-summary-widget > div > div > div.status-field')
       let element = await page.$('#ticket-summary-widget > div > div > div.status-field')
@@ -49,9 +59,22 @@ const scrapeImages = async () =>{
       catch(err) {
         console.error(`Jira status not found for URL ${row['FreshService Ticket URL']}`);
           }
+
+      try {
+        await page.waitForSelector('div:nth-child(5) > div.ticket-conversation-load-more--wrapper > button > span')  
+        let conversation = await page.$('div:nth-child(5) > div.ticket-conversation-load-more--wrapper > button > span')
+       
+        let cst = await page.evaluate(el => el.textContent, conversation)
+        console.log(parseInt(cst))
+        row.CST=parseInt(cst);
+      }
+      catch(err) {
+        console.error(`no conversation ${row['FreshService Ticket URL']}`);
+        row['CST']="0";
+        
+          }
       
-      
-       row.save(); 
+       row.save(); }
     }  
    
 await browser.close(); 
@@ -60,3 +83,6 @@ await browser.close();
 }
 
 scrapeImages()
+// #panel_details > div > div.ticket-conversation-load-more--wrapper > button > span
+// #ticket-summary-widget > div > div.status-info > div.status-field
+// #ticket-summary-widget > div > div > div.status-field
